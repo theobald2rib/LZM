@@ -10,6 +10,14 @@ let tousLesChants = [];
 
 const LIVRET_PRIERE = [
   {
+    titre: "Ouverture",
+    texte: `(Nous commençons par un signe de croix)
+
+Au nom du Père, du Fils et du Saint-Esprit, Amen !
+
+(Nous prenons un chant de louange pour entrer dans la prière.)`
+  },
+  {
     titre: "1) Prière d'introduction",
     texte: `Seigneur Jésus, par l'intercession de Louis et Zélie, nous nous confions à Toi ce soir et nous nous remettons entre Tes mains. Détourne-nous de tout ce qui pourrait en cet instant nous séparer de Toi, Seigneur. Puisse chacun de nous, mieux découvrir de quel amour tu nous aimes !
 
@@ -355,10 +363,11 @@ function tirageSansRemiseAvecPoids_(items, poids, n) {
 
 // ---- Déroulé complet de la soirée (prière + chants + évangile) -----------
 
-/** À quelle section (index 0-based dans LIVRET_PRIERE) insérer les chants de chaque catégorie. */
-const CHANTS_APRES_SECTION = { 1: "Esprit-Saint", 8: "Louange", 9: "Méditation", 10: "Marie" };
+/** À quelle section (index 0-based dans LIVRET_PRIERE) insérer les chants de chaque catégorie.
+ *  Le chant de Louange de l'ouverture est le même que celui choisi pour la prière 9 (pas de second tirage). */
+const CHANTS_APRES_SECTION = { 0: "Louange", 2: "Esprit-Saint", 9: "Louange", 10: "Méditation", 11: "Marie" };
 /** Section après laquelle insérer l'évangile du jour ("4) Lecture de la Bible"). */
-const EVANGILE_APRES_SECTION = 3;
+const EVANGILE_APRES_SECTION = 4;
 
 async function afficherDeroule() {
   document.getElementById("panel-formulaire-seance").hidden = true;
