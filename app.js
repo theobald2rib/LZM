@@ -220,25 +220,39 @@ async function chargerEvangileOnglet() {
 
 document.getElementById("seance-date").valueAsDate = new Date();
 
+// Le formulaire (date + chants + notes) est visible dès l'arrivée sur
+// l'onglet, pas seulement après un premier clic sur "Créer la soirée".
+afficherChoixChants();
+
 document.getElementById("btn-nouvelle-seance").addEventListener("click", async () => {
   const date = document.getElementById("seance-date").value;
   if (!date) return alert("Merci de choisir une date.");
+  const chantsIds = Array.from(
+    document.querySelectorAll("#chants-par-categorie input[type=checkbox]:checked")
+  ).map(el => el.value);
+  const notes = document.getElementById("seance-notes").value;
 
+  const btn = document.getElementById("btn-nouvelle-seance");
+  btn.disabled = true;
   try {
-    const { id } = await apiPost("creerSeance", { date });
-    seanceActive = await apiGet("obtenirSeance", { id });
-    await afficherSeanceActive();
+    const { id } = await apiPost("creerSeance", { date, chantsIds, notes });
+    seanceActive = { id, date, chantsIds, notes };
+    await afficherDeroule();
   } catch (e) {
     alert("Erreur : " + e.message);
+  } finally {
+    btn.disabled = false;
   }
 });
 
-async function afficherSeanceActive() {
-  document.getElementById("panel-seance-active").hidden = false;
-  document.getElementById("seance-active-date").textContent = formaterDateFr_(seanceActive.date);
-  document.getElementById("seance-notes").value = seanceActive.notes || "";
-  await afficherChoixChants();
-}
+document.getElementById("btn-nouvelle-soiree-reset").addEventListener("click", () => {
+  seanceActive = null;
+  document.getElementById("panel-deroule-seance").hidden = true;
+  document.getElementById("panel-formulaire-seance").hidden = false;
+  document.getElementById("export-liens").innerHTML = "";
+  document.querySelectorAll("#chants-par-categorie input[type=checkbox]").forEach(cb => (cb.checked = false));
+  document.getElementById("seance-notes").value = "";
+});
 
 async function afficherChoixChants() {
   if (tousLesChants.length === 0) {
@@ -265,20 +279,16 @@ async function afficherChoixChants() {
     chantsCat.forEach(chant => {
       const row = document.createElement("div");
       row.className = "chant-checkbox";
-      const checked = seanceActive.chantsIds.includes(chant.id) ? "checked" : "";
-      const aDetails = chant.paroles || chant.lien;
       row.innerHTML = `
         <label>
-          <input type="checkbox" value="${chant.id}" data-categorie="${cat}" data-usage="${chant.nbUtilisations || 0}" ${checked}>
+          <input type="checkbox" value="${chant.id}" data-categorie="${cat}" data-usage="${chant.nbUtilisations || 0}">
           ${echapperHtml_(chant.titre)} <span class="usage-badge" title="Nombre de fois utilisé dans les soirées passées">${chant.nbUtilisations || 0}×</span>
         </label>
-        ${aDetails ? `
-          <details class="chant-paroles">
-            <summary>Paroles${chant.lien ? " et lien" : ""}</summary>
-            ${chant.lien ? `<div class="chant-liens"><a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a></div>` : ""}
-            ${chant.paroles ? `<pre>${echapperHtml_(chant.paroles)}</pre>` : ""}
-          </details>
-        ` : ""}
+        <details class="chant-paroles">
+          <summary>Paroles${chant.lien ? " et lien" : ""}</summary>
+          ${chant.lien ? `<div class="chant-liens"><a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a></div>` : ""}
+          <pre>${chant.paroles ? echapperHtml_(chant.paroles) : "(paroles non renseignées)"}</pre>
+        </details>
       `;
       bloc.appendChild(row);
     });
@@ -328,35 +338,73 @@ function tirageSansRemiseAvecPoids_(items, poids, n) {
   return resultat;
 }
 
-function cssEscape_(str) {
-  return window.CSS && CSS.escape ? CSS.escape(str) : str.replace(/([^\w-])/g, "\\$1");
-}
+// ---- Déroulé complet de la soirée (prière + chants + évangile) -----------
 
-/** Formate une date "YYYY-MM-DD" en français ("jeudi 18 septembre 2026"). */
-function formaterDateFr_(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr.length === 10 ? dateStr + "T00:00:00" : dateStr);
-  if (isNaN(d)) return dateStr;
-  const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-  const mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
-                "août", "septembre", "octobre", "novembre", "décembre"];
-  return `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
-}
+/** À quelle section (index 0-based dans LIVRET_PRIERE) insérer les chants de chaque catégorie. */
+const CHANTS_APRES_SECTION = { 1: "Esprit-Saint", 8: "Louange", 9: "Méditation", 10: "Marie" };
+/** Section après laquelle insérer l'évangile du jour ("4) Lecture de la Bible"). */
+const EVANGILE_APRES_SECTION = 3;
 
-document.getElementById("btn-sauver-seance").addEventListener("click", async () => {
-  const chantsIds = Array.from(
-    document.querySelectorAll("#chants-par-categorie input[type=checkbox]:checked")
-  ).map(el => el.value);
-  const notes = document.getElementById("seance-notes").value;
+async function afficherDeroule() {
+  document.getElementById("panel-formulaire-seance").hidden = true;
+  document.getElementById("panel-deroule-seance").hidden = false;
+  document.getElementById("deroule-date").textContent = formaterDateFr_(seanceActive.date);
+  document.getElementById("export-liens").innerHTML = "";
 
+  const chantsSeance = seanceActive.chantsIds
+    .map(id => tousLesChants.find(c => c.id === id))
+    .filter(Boolean);
+
+  let evangile = null;
   try {
-    await apiPost("modifierSeance", { id: seanceActive.id, chantsIds, notes });
-    seanceActive.chantsIds = chantsIds;
-    alert("Soirée enregistrée.");
+    evangile = await apiGet("obtenirEvangileDuJour", { date: seanceActive.date });
   } catch (e) {
-    alert("Erreur : " + e.message);
+    // on continue sans : l'évangile n'est pas indispensable au déroulé
   }
-});
+
+  const container = document.getElementById("deroule-contenu");
+  container.innerHTML = "";
+
+  LIVRET_PRIERE.forEach((section, index) => {
+    const bloc = document.createElement("div");
+    bloc.className = "livret-section";
+    const h3 = document.createElement("h3");
+    h3.textContent = section.titre;
+    bloc.appendChild(h3);
+    section.texte.split("\n\n").forEach(paragraphe => {
+      const p = document.createElement("p");
+      p.className = paragraphe.trim().startsWith("(") ? "rubrique" : "livret-texte";
+      p.textContent = paragraphe.trim();
+      bloc.appendChild(p);
+    });
+    container.appendChild(bloc);
+
+    if (index === EVANGILE_APRES_SECTION) {
+      const boxEvangile = document.createElement("div");
+      boxEvangile.className = "evangile-box deroule-insert";
+      boxEvangile.innerHTML = evangile
+        ? `<strong>${echapperHtml_(evangile.titre)}</strong> (${echapperHtml_(evangile.ref)})<br><br>${echapperHtml_(evangile.texte)}`
+        : "Évangile du jour indisponible.";
+      container.appendChild(boxEvangile);
+    }
+
+    const categorieChants = CHANTS_APRES_SECTION[index];
+    if (categorieChants) {
+      chantsSeance
+        .filter(c => c.categorie === categorieChants)
+        .forEach(chant => {
+          const blocChant = document.createElement("div");
+          blocChant.className = "deroule-insert deroule-chant";
+          blocChant.innerHTML = `
+            <h4>🎵 ${echapperHtml_(chant.titre)}</h4>
+            ${chant.lien ? `<div class="chant-liens"><a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a></div>` : ""}
+            <pre>${chant.paroles ? echapperHtml_(chant.paroles) : "(paroles non renseignées)"}</pre>
+          `;
+          container.appendChild(blocChant);
+        });
+    }
+  });
+}
 
 document.getElementById("btn-export-priere").addEventListener("click", () => exporterLivret("genererLivretPriere"));
 document.getElementById("btn-export-chants").addEventListener("click", () => exporterLivret("genererLivretChants"));
@@ -514,15 +562,24 @@ document.getElementById("recherche-chants").addEventListener("input", e => {
 // ---- Historique -----------------------------------------------------------
 
 async function chargerHistorique() {
+  if (tousLesChants.length === 0) {
+    tousLesChants = await apiGet("listerChants", { inclureInactifs: "true" });
+  }
   const seances = await apiGet("listerSeances");
   const container = document.getElementById("liste-seances");
   container.innerHTML = "";
   seances.forEach(s => {
+    const titresChants = s.chantsIds
+      .map(id => tousLesChants.find(c => c.id === id))
+      .filter(Boolean)
+      .map(c => c.titre);
+
     const div = document.createElement("div");
     div.className = "chant-item";
     div.innerHTML = `
       <h4>${formaterDateFr_(s.date)}</h4>
       <div class="meta">${s.chantsIds.length} chant(s) sélectionné(s) · ${s.statut}</div>
+      ${titresChants.length ? `<div class="meta">${titresChants.map(echapperHtml_).join(" · ")}</div>` : ""}
     `;
     container.appendChild(div);
   });
