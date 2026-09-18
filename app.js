@@ -1,5 +1,6 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
 const API_URL = "https://script.google.com/macros/s/AKfycbwmAdRHiaE9p1u7jV92fiZv0HC1GLnZVlrU2_YkQ4lGIxgFjXxwxpUmE1HB89oUfd-6/exec";
+
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
 
 let seanceActive = null;
@@ -525,6 +526,26 @@ function lireFichierEnBase64_(fichier) {
     reader.readAsDataURL(fichier);
   });
 }
+
+document.getElementById("btn-export-referentiel").addEventListener("click", async () => {
+  const zone = document.getElementById("export-referentiel-lien");
+  const btn = document.getElementById("btn-export-referentiel");
+  btn.disabled = true;
+  zone.textContent = "Génération du PDF en cours…";
+  try {
+    const { url } = await apiPost("genererLivretChantsComplet");
+    zone.innerHTML = "";
+    const lien = document.createElement("a");
+    lien.href = url;
+    lien.target = "_blank";
+    lien.textContent = "📎 Télécharger le carnet complet";
+    zone.appendChild(lien);
+  } catch (e) {
+    zone.textContent = "Erreur : " + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 async function chargerReferentielChants() {
   tousLesChants = await apiGet("listerChants");
