@@ -1,0 +1,312 @@
+/* ===========================================================
+   Soirée LZM — palette "missel / livret ancien"
+   Encre nuit · parchemin ivoire · or mat · rubriques bordeaux
+   =========================================================== */
+
+:root {
+  --encre: #1c2f4a;
+  --encre-clair: #33507a;
+  --parchemin: #f8f3e6;
+  --parchemin-ombre: #efe4cd;
+  --or: #a67c3d;
+  --or-clair: #c9a463;
+  --bordeaux: #7a2e2e;
+  --texte: #26221b;
+  --bordure: #d9c9a3;
+
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "EB Garamond", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  background: var(--parchemin);
+  color: var(--texte);
+  line-height: 1.5;
+}
+
+/* ---- Masthead ---- */
+
+header {
+  background: var(--encre);
+  color: var(--parchemin);
+  padding: 2.25rem 2rem 0;
+  border-bottom: 3px double var(--or-clair);
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 2.1rem;
+  letter-spacing: 0.02em;
+}
+
+.masthead-subtitle {
+  margin: 0.25rem 0 1.5rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(248, 243, 230, 0.72);
+}
+
+nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(248, 243, 230, 0.68);
+  padding: 0.7rem 1.1rem;
+  font-family: var(--font-body);
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  color: var(--parchemin);
+  border-bottom-color: var(--or-clair);
+}
+
+.tab-btn:hover { color: var(--parchemin); }
+
+/* ---- Layout ---- */
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.panel {
+  background: var(--parchemin-ombre);
+  border-top: 2px solid var(--or);
+  border-radius: 0;
+  padding: 1.75rem 1.75rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.panel h2 {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  color: var(--encre);
+}
+
+.panel h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--encre);
+  margin: 1.5rem 0 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bordure);
+}
+
+.panel h3:first-of-type { border-top: none; padding-top: 0; }
+
+.rubrique {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--bordeaux);
+  font-size: 0.92rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ---- Formulaires ---- */
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  align-items: end;
+}
+
+.form-row label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  font-style: italic;
+  gap: 0.3rem;
+  color: var(--encre);
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--bordure);
+  border-radius: 2px;
+  background: var(--parchemin);
+  color: var(--texte);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--or-clair);
+  outline-offset: 1px;
+}
+
+textarea { width: 100%; resize: vertical; font-size: 0.98rem; }
+
+button {
+  font-family: var(--font-body);
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  font-size: 1rem;
+  background: var(--encre);
+  color: var(--parchemin);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 0.55rem 1.1rem;
+}
+
+button:hover { background: var(--encre-clair); }
+
+/* ---- Évangile du jour ---- */
+
+.evangile-box {
+  background: var(--parchemin);
+  border-left: 3px solid var(--bordeaux);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  white-space: pre-wrap;
+  font-size: 0.98rem;
+}
+
+/* ---- Tirage aléatoire des chants ---- */
+
+#btn-tirer-tout {
+  background: var(--bordeaux);
+  margin-bottom: 1rem;
+}
+
+#btn-tirer-tout:hover { background: #632424; }
+
+.categorie-bloc { margin-bottom: 1.4rem; }
+
+.categorie-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.categorie-header h4 {
+  color: var(--or);
+  margin: 0;
+  font-family: var(--font-display);
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.tirage-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tirage-controls input[type="number"] {
+  width: 3.2rem;
+  padding: 0.3rem 0.4rem;
+  text-align: center;
+}
+
+.tirage-controls button, .btn-shuffle {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.btn-shuffle {
+  background: transparent;
+  color: var(--bordeaux);
+  border: 1px solid var(--bordure);
+  font-variant: normal;
+}
+
+.btn-shuffle:hover { background: var(--parchemin); }
+
+.chant-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dotted var(--bordure);
+}
+
+.chant-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+}
+
+.usage-badge {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--or);
+  background: var(--parchemin);
+  border: 1px solid var(--bordure);
+  padding: 0.05rem 0.4rem;
+  border-radius: 8px;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- Listes (référentiel, historique) ---- */
+
+.chant-item {
+  border-bottom: 1px solid var(--bordure);
+  padding: 0.7rem 0;
+}
+
+.chant-item h4 {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--texte);
+}
+
+.chant-item .meta {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #7a7263;
+}
+
+#export-liens a {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: var(--bordeaux);
+  font-style: italic;
+}
+
+/* ---- Accessibilité : mouvement réduit ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
