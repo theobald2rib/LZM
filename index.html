@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soirée LZM — Préparation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Soirée LZM</h1>
+    <p class="masthead-subtitle">Groupe de prière Louis et Zélie Martin — préparation des soirées</p>
+    <nav>
+      <button class="tab-btn active" data-tab="preparer">Préparer une soirée</button>
+      <button class="tab-btn" data-tab="chants">Référentiel des chants</button>
+      <button class="tab-btn" data-tab="historique">Historique</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Onglet : Préparer une soirée -->
+    <section id="tab-preparer" class="tab-content active">
+      <div class="panel">
+        <h2>Nouvelle soirée</h2>
+        <div class="form-row">
+          <label>Date
+            <input type="date" id="seance-date">
+          </label>
+          <button id="btn-nouvelle-seance">Créer la soirée</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-seance-active" hidden>
+        <h2>Soirée du <span id="seance-active-date"></span></h2>
+
+        <div class="evangile-box">
+          <h3>Évangile du jour</h3>
+          <p class="rubrique">Affiché ici pour suivre en direct pendant la soirée — n'est pas inclus dans le PDF imprimé.</p>
+          <div id="evangile-contenu">Chargement…</div>
+        </div>
+
+        <h3>Choisir les chants</h3>
+        <button type="button" id="btn-tirer-tout">🎲 Proposer aléatoirement (toutes catégories)</button>
+        <div id="chants-par-categorie"></div>
+
+        <h3>Notes de préparation</h3>
+        <textarea id="seance-notes" rows="3" placeholder="Notes libres pour la soirée…"></textarea>
+        <button id="btn-sauver-seance">Enregistrer</button>
+
+        <h3>Export</h3>
+        <div class="export-buttons">
+          <button id="btn-export-priere">📄 Exporter le livret de prière (PDF)</button>
+          <button id="btn-export-chants">🎵 Exporter le livret de chants (PDF)</button>
+        </div>
+        <div id="export-liens"></div>
+      </div>
+    </section>
+
+    <!-- Onglet : Référentiel des chants -->
+    <section id="tab-chants" class="tab-content">
+      <div class="panel">
+        <h2>Ajouter un chant</h2>
+        <div class="form-row">
+          <input type="text" id="nouveau-titre" placeholder="Titre du chant">
+          <select id="nouveau-categorie">
+            <option value="Louange">Louange</option>
+            <option value="Méditation">Méditation</option>
+            <option value="Esprit-Saint">Esprit-Saint</option>
+            <option value="Marie">Marie</option>
+          </select>
+          <input type="text" id="nouveau-source" placeholder="Source (livret, recueil…)">
+        </div>
+        <textarea id="nouveau-paroles" rows="4" placeholder="Paroles complètes"></textarea>
+        <button id="btn-ajouter-chant">Ajouter au référentiel</button>
+      </div>
+
+      <div class="panel">
+        <h2>Chants existants</h2>
+        <input type="search" id="recherche-chants" placeholder="Rechercher un chant…">
+        <div id="liste-chants"></div>
+      </div>
+    </section>
+
+    <!-- Onglet : Historique -->
+    <section id="tab-historique" class="tab-content">
+      <div class="panel">
+        <h2>Séances passées</h2>
+        <div id="liste-seances"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
