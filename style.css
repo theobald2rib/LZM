@@ -1,5 +1,5 @@
 /* ===========================================================
-   Soirée LZM — palette "missel / livret ancien"
+   Soirée LZM - palette "missel / livret ancien"
    Encre nuit · parchemin ivoire · or mat · rubriques bordeaux
    =========================================================== */
 
@@ -298,6 +298,40 @@ button:hover { background: var(--encre-clair); }
   color: #7a7263;
 }
 
+.chant-liens {
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+.chant-liens a {
+  color: var(--bordeaux);
+  text-decoration: none;
+  margin-right: 0.5rem;
+}
+
+.chant-liens a:hover { text-decoration: underline; }
+
+.chant-paroles {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.chant-paroles summary {
+  cursor: pointer;
+  color: var(--encre-clair);
+  font-style: italic;
+}
+
+.chant-paroles pre {
+  font-family: var(--font-body);
+  white-space: pre-wrap;
+  background: var(--parchemin);
+  border-left: 2px solid var(--bordure);
+  padding: 0.6rem 0.9rem;
+  margin: 0.5rem 0 0;
+  max-width: 68ch;
+}
+
 #export-liens a {
   display: inline-block;
   margin-top: 0.75rem;
@@ -391,7 +425,7 @@ dialog h2 {
 .btn-secondaire:hover { background: var(--parchemin-ombre); }
 
 /* ===========================================================
-   Responsive — mobile
+   Responsive - mobile
    =========================================================== */
 
 @media (max-width: 640px) {
