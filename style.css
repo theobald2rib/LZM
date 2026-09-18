@@ -310,3 +310,179 @@ button:hover { background: var(--encre-clair); }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---- Livret de prière (lecture à l'écran) ---- */
+
+.livret-section {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--bordure);
+}
+
+.livret-section:last-child { border-bottom: none; }
+
+.livret-section h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--encre);
+  margin: 0 0 0.6rem;
+}
+
+.livret-texte {
+  margin: 0 0 0.9rem;
+  max-width: 68ch;
+}
+
+.livret-section .rubrique { max-width: 68ch; }
+
+/* ---- En-tête de panneau avec action ---- */
+
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.panel-header-row h2 { margin: 0; }
+
+/* ---- Fenêtre modale d'ajout de chant ---- */
+
+dialog {
+  font-family: var(--font-body);
+  color: var(--texte);
+  background: var(--parchemin);
+  border: none;
+  border-top: 3px solid var(--or);
+  border-radius: 0;
+  padding: 1.75rem;
+  width: min(560px, 92vw);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+dialog::backdrop {
+  background: rgba(28, 47, 74, 0.55);
+}
+
+dialog h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--encre);
+  margin: 0 0 1.1rem;
+  font-size: 1.4rem;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.btn-secondaire {
+  background: transparent;
+  color: var(--encre);
+  border: 1px solid var(--bordure);
+}
+
+.btn-secondaire:hover { background: var(--parchemin-ombre); }
+
+/* ===========================================================
+   Responsive — mobile
+   =========================================================== */
+
+@media (max-width: 640px) {
+  header {
+    padding: 1.5rem 1.25rem 0;
+  }
+
+  header h1 {
+    font-size: 1.7rem;
+  }
+
+  .masthead-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    gap: 0.15rem;
+  }
+
+  .tab-btn {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.95rem;
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  main {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .panel {
+    padding: 1.25rem 1.1rem 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-row label { width: 100%; }
+
+  .form-row input, .form-row select, .form-row button {
+    width: 100%;
+  }
+
+  .categorie-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .tirage-controls { width: 100%; }
+
+  .tirage-controls .btn-tirer { flex: 1; }
+
+  .chant-checkbox {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .chant-checkbox .btn-shuffle { align-self: flex-end; }
+
+  .export-buttons {
+    flex-direction: column;
+  }
+
+  .export-buttons button { width: 100%; }
+
+  .panel-header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panel-header-row button { width: 100%; }
+
+  dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+    padding: 1.5rem 1.1rem;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button { width: 100%; }
+}
