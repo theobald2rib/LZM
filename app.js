@@ -527,25 +527,28 @@ function lireFichierEnBase64_(fichier) {
   });
 }
 
-document.getElementById("btn-export-referentiel").addEventListener("click", async () => {
+document.getElementById("btn-export-referentiel").addEventListener("click", () => exporterCarnetComplet());
+document.getElementById("btn-export-referentiel-gdoc").addEventListener("click", () => exporterCarnetComplet("gdoc"));
+
+async function exporterCarnetComplet(format) {
   const zone = document.getElementById("export-referentiel-lien");
-  const btn = document.getElementById("btn-export-referentiel");
-  btn.disabled = true;
-  zone.textContent = "Génération du PDF en cours…";
+  const btns = [document.getElementById("btn-export-referentiel"), document.getElementById("btn-export-referentiel-gdoc")];
+  btns.forEach(b => (b.disabled = true));
+  zone.textContent = format === "gdoc" ? "Préparation du Google Doc en cours…" : "Génération du PDF en cours…";
   try {
-    const { url } = await apiPost("genererLivretChantsComplet");
+    const { url } = await apiPost("genererLivretChantsComplet", format ? { format } : {});
     zone.innerHTML = "";
     const lien = document.createElement("a");
     lien.href = url;
     lien.target = "_blank";
-    lien.textContent = "📎 Télécharger le carnet complet";
+    lien.textContent = format === "gdoc" ? "📎 Ouvrir le Google Doc" : "📎 Télécharger le carnet complet";
     zone.appendChild(lien);
   } catch (e) {
     zone.textContent = "Erreur : " + e.message;
   } finally {
-    btn.disabled = false;
+    btns.forEach(b => (b.disabled = false));
   }
-});
+}
 
 async function chargerReferentielChants() {
   tousLesChants = await apiGet("listerChants");
