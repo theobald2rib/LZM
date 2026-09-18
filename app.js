@@ -71,12 +71,12 @@ Saint Joseph, nous te confions tous les pères de famille, particulièrement ceu
 
 Nous Te confions tous ceux qui se préparent au mariage, aide-les à mesurer la beauté de cet engagement. Nous Te confions tous les couples qui se déchirent, tous les couples qui connaissent le chômage, la maladie ou le handicap, tous les couples qui ont perdu un enfant (né ou à naître), tous les couples qui sont frappés par l'alcool, la violence, la drogue, toutes les familles qui connaissent le martyre dans le monde à cause de leur Foi…
 
-(Ici, nous nommons les uns après les autres les prénoms des couples en difficulté que nous connaissons, et finissons par « Amen » — si l'un de nous ne souhaite pas s'exprimer, il dira simplement « Amen », signifiant ainsi que nous pouvons poursuivre la prière.)
+(Ici, nous nommons les uns après les autres les prénoms des couples en difficulté que nous connaissons, et finissons par « Amen » - si l'un de nous ne souhaite pas s'exprimer, il dira simplement « Amen », signifiant ainsi que nous pouvons poursuivre la prière.)
 
 Seigneur, viens à leur rencontre, viens les bénir, les prendre sous Ta tendre protection, pour qu'ils trouvent en Toi le réconfort, la force et l'Espérance.`
   },
   {
-    titre: "8) Prière pour avoir le désir d'aller au Ciel — et donc de devenir saint !",
+    titre: "8) Prière pour avoir le désir d'aller au Ciel - et donc de devenir saint !",
     texte: `Seigneur, donne-nous de désirer aller au Ciel et donc… devenir des saints ! Fais grandir en nous ce désir, ou peut-être simplement fais-le naître. Change nos cœurs pour que nous t'aimions aujourd'hui plus qu'hier, et demain plus encore qu'aujourd'hui, et qu'au jour de notre mort notre cœur soit à la dimension de Ton amour !
 
 Nous qui nous préoccupons si souvent de la réussite matérielle ou professionnelle, donne-nous de voir plus loin, plus haut, plus grand ! Si nous avons des enfants, guide les choix que nous faisons pour eux. Éclaire notre intelligence et notre cœur pour que nous puissions les conduire chaque jour, par le témoignage de nos vies, vers le Ciel !
@@ -89,7 +89,7 @@ Permets qu'en accomplissant notre mission conjugale et familiale avec l'incroyab
   },
   {
     titre: "9) Prière de louange / action de grâce",
-    texte: `(Nous pouvons prendre des chants de louange — c'est-à-dire de remerciement à Dieu pour ce qu'Il est — puis chacun exprime à voix haute plusieurs motifs d'action de grâce et finit par « Amen ». Si le groupe a du mal à exprimer des motifs de louange, nous pouvons lire la prière ci-après.)
+    texte: `(Nous pouvons prendre des chants de louange - c'est-à-dire de remerciement à Dieu pour ce qu'Il est - puis chacun exprime à voix haute plusieurs motifs d'action de grâce et finit par « Amen ». Si le groupe a du mal à exprimer des motifs de louange, nous pouvons lire la prière ci-après.)
 
 Seigneur, nous voulons Te louer pour la manne que tu nous donnes chaque jour. Si Tu venais une seule seconde à ne plus nous aimer : nous mourrions ! Merci Seigneur pour Ton amour, pour ce que nous sommes chacun, pour nos talents, pour les dons que Tu nous as donnés et que nous n'avons peut-être pas encore tous découverts.
 
@@ -100,12 +100,12 @@ Nous Te remercions pour la vie, pour notre vie, quelle qu'elle soit ! Nous te lo
 Nous Te louons pour la joie et la grâce que Tu nous donnes chaque jour, comme Tu donnais la manne aux Hébreux dans le désert. Nous Te louons car notre cœur est fait pour cela !`
   },
   {
-    titre: "10) Prière d'intercession — confier notre couple au Christ par les mains de Louis et Zélie",
+    titre: "10) Prière d'intercession - confier notre couple au Christ par les mains de Louis et Zélie",
     texte: `Seigneur, Tu es là, maintenant, au milieu de nous. Tu nous as montré par la vie de Saints Louis et Zélie Martin, les parents de Sainte Thérèse, combien Tu as été présent dans le quotidien de leur vie, et particulièrement dans les tempêtes qu'ils ont traversées. Tu n'étais pas un étranger, ni un Dieu lointain, mais Tu étais le pilier de leur famille. Tu es un père qui s'occupe avec une infinie bienveillance de ses enfants.
 
 C'est avec la confiance des petits enfants que nous venons devant Toi Te confier notre couple, nos enfants, nos projets et les intentions que nous portons.
 
-(Nous pouvons prendre un chant méditatif, par exemple « En toi, j'ai mis ma confiance ». Puis chaque couple peut s'agenouiller à tour de rôle devant la Croix de Jésus et déposer un petit papier rond portant les prénoms du couple, et un pour chaque enfant. On dira par exemple : « Seigneur, nous [prénoms], nous nous confions à Toi… nous te confions nos enfants [prénoms] et tout particulièrement [une intention] » — puis le couple revient s'asseoir pendant qu'un chant méditatif accompagne le passage du couple suivant, jusqu'à ce que tous aient déposé leur famille devant la Croix du Christ.)`
+(Nous pouvons prendre un chant méditatif, par exemple « En toi, j'ai mis ma confiance ». Puis chaque couple peut s'agenouiller à tour de rôle devant la Croix de Jésus et déposer un petit papier rond portant les prénoms du couple, et un pour chaque enfant. On dira par exemple : « Seigneur, nous [prénoms], nous nous confions à Toi… nous te confions nos enfants [prénoms] et tout particulièrement [une intention] » - puis le couple revient s'asseoir pendant qu'un chant méditatif accompagne le passage du couple suivant, jusqu'à ce que tous aient déposé leur famille devant la Croix du Christ.)`
   },
   {
     titre: "11) Prière à Marie",
@@ -388,20 +388,48 @@ document.getElementById("btn-ajouter-chant").addEventListener("click", async () 
   const categorie = document.getElementById("nouveau-categorie").value;
   const source = document.getElementById("nouveau-source").value;
   const paroles = document.getElementById("nouveau-paroles").value;
+  const lien = document.getElementById("nouveau-lien").value;
+  const fichierPartition = document.getElementById("nouveau-partition").files[0];
   if (!titre) return alert("Merci de renseigner un titre.");
 
+  const btn = document.getElementById("btn-ajouter-chant");
+  btn.disabled = true;
   try {
-    await apiPost("ajouterChant", { titre, categorie, source, paroles });
-    document.getElementById("nouveau-titre").value = "";
-    document.getElementById("nouveau-source").value = "";
-    document.getElementById("nouveau-paroles").value = "";
+    const { id } = await apiPost("ajouterChant", { titre, categorie, source, paroles, lien });
+
+    if (fichierPartition) {
+      const fileBase64 = await lireFichierEnBase64_(fichierPartition);
+      await apiPost("televerserPartition", {
+        chantId: id,
+        fileBase64,
+        fileName: fichierPartition.name,
+        mimeType: fichierPartition.type
+      });
+    }
+
+    ["nouveau-titre", "nouveau-source", "nouveau-paroles", "nouveau-lien"].forEach(
+      idChamp => (document.getElementById(idChamp).value = "")
+    );
+    document.getElementById("nouveau-partition").value = "";
     dialogAjoutChant.close();
     tousLesChants = []; // force le rechargement
     await chargerReferentielChants();
   } catch (e) {
     alert("Erreur : " + e.message);
+  } finally {
+    btn.disabled = false;
   }
 });
+
+/** Lit un fichier <input type=file> et renvoie son contenu en base64 (sans le préfixe data:...;base64,). */
+function lireFichierEnBase64_(fichier) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(fichier);
+  });
+}
 
 async function chargerReferentielChants() {
   tousLesChants = await apiGet("listerChants");
@@ -414,12 +442,30 @@ function afficherListeChants(chants) {
   chants.forEach(chant => {
     const div = document.createElement("div");
     div.className = "chant-item";
+
+    const liens = [];
+    if (chant.lien) liens.push(`<a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a>`);
+    if (chant.partitionUrl) liens.push(`<a href="${echapperHtml_(chant.partitionUrl)}" target="_blank">🎼 Partition</a>`);
+
     div.innerHTML = `
-      <h4>${chant.titre}</h4>
-      <div class="meta">${chant.categorie}${chant.source ? " · " + chant.source : ""} · utilisé ${chant.nbUtilisations || 0} fois</div>
+      <h4>${echapperHtml_(chant.titre)}</h4>
+      <div class="meta">${echapperHtml_(chant.categorie)}${chant.source ? " · " + echapperHtml_(chant.source) : ""} · utilisé ${chant.nbUtilisations || 0} fois</div>
+      ${liens.length ? `<div class="chant-liens">${liens.join(" · ")}</div>` : ""}
+      ${chant.paroles ? `
+        <details class="chant-paroles">
+          <summary>Voir les paroles</summary>
+          <pre>${echapperHtml_(chant.paroles)}</pre>
+        </details>
+      ` : ""}
     `;
     container.appendChild(div);
   });
+}
+
+function echapperHtml_(texte) {
+  const div = document.createElement("div");
+  div.textContent = texte == null ? "" : String(texte);
+  return div.innerHTML;
 }
 
 document.getElementById("recherche-chants").addEventListener("input", e => {
