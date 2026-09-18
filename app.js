@@ -1,5 +1,5 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
-const API_URL = "COLLEZ_ICI_VOTRE_URL_/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxCXS7U0JpkNw40dZOrJamHMEsf1W2hH0pc4veQUOEI-QeGn76iSMZFXKdAbcr1cufE/exec";
 
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
 
