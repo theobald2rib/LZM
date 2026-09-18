@@ -1,6 +1,5 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
 const API_URL = "https://script.google.com/macros/s/AKfycbxCXS7U0JpkNw40dZOrJamHMEsf1W2hH0pc4veQUOEI-QeGn76iSMZFXKdAbcr1cufE/exec";
-
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
 
 let seanceActive = null;
@@ -435,6 +434,42 @@ async function chargerReferentielChants() {
   tousLesChants = await apiGet("listerChants");
   afficherListeChants(tousLesChants);
 }
+
+// ---- Import en masse de chants -----------------------------------------
+
+const dialogImportMasse = document.getElementById("dialog-import-masse");
+
+document.getElementById("btn-ouvrir-import-masse").addEventListener("click", () => {
+  document.getElementById("import-masse-resultat").innerHTML = "";
+  dialogImportMasse.showModal();
+});
+document.getElementById("btn-annuler-import-masse").addEventListener("click", () => {
+  dialogImportMasse.close();
+});
+
+document.getElementById("btn-lancer-import-masse").addEventListener("click", async () => {
+  const texte = document.getElementById("import-masse-texte").value;
+  const zoneResultat = document.getElementById("import-masse-resultat");
+  if (!texte.trim()) return alert("Collez du texte à importer.");
+
+  const btn = document.getElementById("btn-lancer-import-masse");
+  btn.disabled = true;
+  zoneResultat.textContent = "Import en cours…";
+  try {
+    const resultat = await apiPost("importerChantsEnMasse", { texte });
+    zoneResultat.innerHTML = `
+      ${resultat.ajoutes} ajouté(s), ${resultat.misAJour} mis à jour.
+      ${resultat.erreurs.length ? `<br>Erreurs : ${resultat.erreurs.map(echapperHtml_).join(" · ")}` : ""}
+    `;
+    document.getElementById("import-masse-texte").value = "";
+    tousLesChants = [];
+    await chargerReferentielChants();
+  } catch (e) {
+    zoneResultat.textContent = "Erreur : " + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 function afficherListeChants(chants) {
   const container = document.getElementById("liste-chants");
