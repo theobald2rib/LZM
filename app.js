@@ -1,5 +1,4 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
-
 const API_URL = "https://script.google.com/macros/s/AKfycbxCXS7U0JpkNw40dZOrJamHMEsf1W2hH0pc4veQUOEI-QeGn76iSMZFXKdAbcr1cufE/exec";
 
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
@@ -156,14 +155,32 @@ async function apiGet(action, params = {}) {
 }
 
 async function apiPost(action, payload = {}) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain;charset=utf-8" }, // évite le préflight CORS
-    body: JSON.stringify({ action, ...payload })
-  });
+  // Envoyé en GET (données dans ?payload=<JSON>) plutôt qu'en vrai POST :
+  // voir le commentaire en tête de Code.gs pour l'explication du blocage
+  // CORS que ça contourne.
+  const url = new URL(API_URL);
+  url.searchParams.set("action", action);
+  url.searchParams.set("payload", JSON.stringify(payload));
+  const res = await fetch(url);
   const json = await res.json();
   if (!json.success) throw new Error(json.error?.message || "Erreur inconnue");
   return json.data;
+}
+
+/**
+ * Pour les payloads trop volumineux pour une URL (fichier en base64, import
+ * en masse) : vrai POST en mode "no-cors". On ne peut pas lire la réponse
+ * (le navigateur la rend opaque), mais l'action s'exécute bien côté
+ * serveur — on recharge simplement les données ensuite plutôt que
+ * d'afficher un résultat détaillé.
+ */
+async function apiPostVolumineux(action, payload = {}) {
+  await fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ action, ...payload })
+  });
 }
 
 // ---- Onglets ------------------------------------------------------------
@@ -386,7 +403,7 @@ document.getElementById("btn-ajouter-chant").addEventListener("click", async () 
 
     if (fichierPartition) {
       const fileBase64 = await lireFichierEnBase64_(fichierPartition);
-      await apiPost("televerserPartition", {
+      await apiPostVolumineux("televerserPartition", {
         chantId: id,
         fileBase64,
         fileName: fichierPartition.name,
@@ -444,14 +461,12 @@ document.getElementById("btn-lancer-import-masse").addEventListener("click", asy
   btn.disabled = true;
   zoneResultat.textContent = "Import en cours…";
   try {
-    const resultat = await apiPost("importerChantsEnMasse", { texte });
-    zoneResultat.innerHTML = `
-      ${resultat.ajoutes} ajouté(s), ${resultat.misAJour} mis à jour.
-      ${resultat.erreurs.length ? `<br>Erreurs : ${resultat.erreurs.map(echapperHtml_).join(" · ")}` : ""}
-    `;
+    await apiPostVolumineux("importerChantsEnMasse", { texte });
+    zoneResultat.textContent = "Import envoyé. Rechargement du référentiel…";
     document.getElementById("import-masse-texte").value = "";
     tousLesChants = [];
     await chargerReferentielChants();
+    zoneResultat.textContent = "Référentiel mis à jour — vérifiez la liste ci-dessous.";
   } catch (e) {
     zoneResultat.textContent = "Erreur : " + e.message;
   } finally {
