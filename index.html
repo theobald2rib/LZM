@@ -14,8 +14,10 @@
     <h1>Soirée LZM</h1>
     <p class="masthead-subtitle">Groupe de prière Louis et Zélie Martin — préparation des soirées</p>
     <nav>
-      <button class="tab-btn active" data-tab="preparer">Préparer une soirée</button>
-      <button class="tab-btn" data-tab="chants">Référentiel des chants</button>
+      <button class="tab-btn active" data-tab="preparer">Préparer</button>
+      <button class="tab-btn" data-tab="livret">Livret</button>
+      <button class="tab-btn" data-tab="evangile">Évangile du jour</button>
+      <button class="tab-btn" data-tab="chants">Chants</button>
       <button class="tab-btn" data-tab="historique">Historique</button>
     </nav>
   </header>
@@ -36,12 +38,6 @@
       <div class="panel" id="panel-seance-active" hidden>
         <h2>Soirée du <span id="seance-active-date"></span></h2>
 
-        <div class="evangile-box">
-          <h3>Évangile du jour</h3>
-          <p class="rubrique">Affiché ici pour suivre en direct pendant la soirée — n'est pas inclus dans le PDF imprimé.</p>
-          <div id="evangile-contenu">Chargement…</div>
-        </div>
-
         <h3>Choisir les chants</h3>
         <button type="button" id="btn-tirer-tout">🎲 Proposer aléatoirement (toutes catégories)</button>
         <div id="chants-par-categorie"></div>
@@ -59,26 +55,36 @@
       </div>
     </section>
 
+    <!-- Onglet : Livret de prière (lecture à l'écran) -->
+    <section id="tab-livret" class="tab-content">
+      <div class="panel">
+        <h2>Prière des couples et des parents</h2>
+        <p class="rubrique">Sous la protection de Saint Louis et Zélie Martin, parents de Sainte Thérèse.</p>
+        <div id="livret-contenu"></div>
+      </div>
+    </section>
+
+    <!-- Onglet : Évangile du jour -->
+    <section id="tab-evangile" class="tab-content">
+      <div class="panel">
+        <h2>Évangile du jour</h2>
+        <div class="form-row">
+          <label>Date
+            <input type="date" id="evangile-date">
+          </label>
+          <button id="btn-actualiser-evangile">Actualiser</button>
+        </div>
+        <div class="evangile-box" id="evangile-jour-contenu">Chargement…</div>
+      </div>
+    </section>
+
     <!-- Onglet : Référentiel des chants -->
     <section id="tab-chants" class="tab-content">
       <div class="panel">
-        <h2>Ajouter un chant</h2>
-        <div class="form-row">
-          <input type="text" id="nouveau-titre" placeholder="Titre du chant">
-          <select id="nouveau-categorie">
-            <option value="Louange">Louange</option>
-            <option value="Méditation">Méditation</option>
-            <option value="Esprit-Saint">Esprit-Saint</option>
-            <option value="Marie">Marie</option>
-          </select>
-          <input type="text" id="nouveau-source" placeholder="Source (livret, recueil…)">
+        <div class="panel-header-row">
+          <h2>Chants du référentiel</h2>
+          <button type="button" id="btn-ouvrir-ajout-chant">+ Ajouter un chant</button>
         </div>
-        <textarea id="nouveau-paroles" rows="4" placeholder="Paroles complètes"></textarea>
-        <button id="btn-ajouter-chant">Ajouter au référentiel</button>
-      </div>
-
-      <div class="panel">
-        <h2>Chants existants</h2>
         <input type="search" id="recherche-chants" placeholder="Rechercher un chant…">
         <div id="liste-chants"></div>
       </div>
@@ -92,6 +98,26 @@
       </div>
     </section>
   </main>
+
+  <!-- Fenêtre modale : ajouter un chant -->
+  <dialog id="dialog-ajouter-chant">
+    <h2>Ajouter un chant</h2>
+    <div class="form-row">
+      <input type="text" id="nouveau-titre" placeholder="Titre du chant">
+      <select id="nouveau-categorie">
+        <option value="Louange">Louange</option>
+        <option value="Méditation">Méditation</option>
+        <option value="Esprit-Saint">Esprit-Saint</option>
+        <option value="Marie">Marie</option>
+      </select>
+      <input type="text" id="nouveau-source" placeholder="Source (livret, recueil…)">
+    </div>
+    <textarea id="nouveau-paroles" rows="5" placeholder="Paroles complètes"></textarea>
+    <div class="dialog-actions">
+      <button type="button" id="btn-annuler-ajout-chant" class="btn-secondaire">Annuler</button>
+      <button type="button" id="btn-ajouter-chant">Ajouter au référentiel</button>
+    </div>
+  </dialog>
 
   <script src="app.js"></script>
 </body>
