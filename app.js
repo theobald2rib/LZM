@@ -428,13 +428,36 @@ async function exporterLivret(action) {
 // ---- Référentiel des chants -----------------------------------------------
 
 const dialogAjoutChant = document.getElementById("dialog-ajouter-chant");
+let chantEnEdition = null; // id du chant en cours de modification, ou null si ajout
 
 document.getElementById("btn-ouvrir-ajout-chant").addEventListener("click", () => {
-  dialogAjoutChant.showModal();
+  ouvrirDialogChant(null);
 });
 document.getElementById("btn-annuler-ajout-chant").addEventListener("click", () => {
   dialogAjoutChant.close();
 });
+
+/** Ouvre la modale en mode ajout (chant=null) ou édition (chant existant). */
+function ouvrirDialogChant(chant) {
+  chantEnEdition = chant ? chant.id : null;
+  document.getElementById("dialog-chant-titre").textContent = chant ? "Modifier un chant" : "Ajouter un chant";
+  document.getElementById("btn-ajouter-chant").textContent = chant ? "Enregistrer les modifications" : "Ajouter au référentiel";
+  document.getElementById("nouveau-titre").value = chant ? chant.titre : "";
+  document.getElementById("nouveau-categorie").value = chant ? chant.categorie : "Louange";
+  document.getElementById("nouveau-paroles").value = chant ? (chant.paroles || "") : "";
+  document.getElementById("nouveau-lien").value = chant ? (chant.lien || "") : "";
+  document.getElementById("nouveau-partition").value = "";
+
+  const notePartition = document.getElementById("dialog-partition-actuelle");
+  if (chant && chant.partitionUrl) {
+    notePartition.hidden = false;
+    notePartition.innerHTML = `Partition actuelle : <a href="${echapperHtml_(chant.partitionUrl)}" target="_blank">🎼 voir</a> — choisir un fichier ci-dessus la remplace.`;
+  } else {
+    notePartition.hidden = true;
+  }
+
+  dialogAjoutChant.showModal();
+}
 
 document.getElementById("btn-ajouter-chant").addEventListener("click", async () => {
   const titre = document.getElementById("nouveau-titre").value;
@@ -447,7 +470,13 @@ document.getElementById("btn-ajouter-chant").addEventListener("click", async () 
   const btn = document.getElementById("btn-ajouter-chant");
   btn.disabled = true;
   try {
-    const { id } = await apiPost("ajouterChant", { titre, categorie, paroles, lien });
+    let id;
+    if (chantEnEdition) {
+      id = chantEnEdition;
+      await apiPost("modifierChant", { id, titre, categorie, paroles, lien });
+    } else {
+      ({ id } = await apiPost("ajouterChant", { titre, categorie, paroles, lien }));
+    }
 
     if (fichierPartition) {
       const fileBase64 = await lireFichierEnBase64_(fichierPartition);
@@ -528,13 +557,17 @@ function afficherListeChants(chants) {
   chants.forEach(chant => {
     const div = document.createElement("div");
     div.className = "chant-item";
+    div.dataset.id = chant.id;
 
     const liens = [];
     if (chant.lien) liens.push(`<a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a>`);
     if (chant.partitionUrl) liens.push(`<a href="${echapperHtml_(chant.partitionUrl)}" target="_blank">🎼 Partition</a>`);
 
     div.innerHTML = `
-      <h4>${echapperHtml_(chant.titre)}</h4>
+      <div class="chant-item-header">
+        <h4>${echapperHtml_(chant.titre)}</h4>
+        <button type="button" class="btn-secondaire btn-modifier-chant" data-id="${chant.id}">Modifier</button>
+      </div>
       <div class="meta">${echapperHtml_(chant.categorie)} · utilisé ${chant.nbUtilisations || 0} fois</div>
       ${liens.length ? `<div class="chant-liens">${liens.join(" · ")}</div>` : ""}
       ${chant.paroles ? `
@@ -545,6 +578,13 @@ function afficherListeChants(chants) {
       ` : ""}
     `;
     container.appendChild(div);
+  });
+
+  container.querySelectorAll(".btn-modifier-chant").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const chant = tousLesChants.find(c => c.id === btn.dataset.id);
+      if (chant) ouvrirDialogChant(chant);
+    });
   });
 }
 
