@@ -328,7 +328,7 @@ button:hover { background: var(--encre-clair); }
   max-width: 68ch;
 }
 
-#export-liens a {
+#export-liens a, #export-referentiel-lien a {
   display: inline-block;
   margin-top: 0.75rem;
   color: var(--bordeaux);
