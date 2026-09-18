@@ -1,5 +1,6 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
 const API_URL = "https://script.google.com/macros/s/AKfycbxCXS7U0JpkNw40dZOrJamHMEsf1W2hH0pc4veQUOEI-QeGn76iSMZFXKdAbcr1cufE/exec";
+
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
 
 let seanceActive = null;
@@ -216,7 +217,7 @@ document.getElementById("btn-nouvelle-seance").addEventListener("click", async (
 
 async function afficherSeanceActive() {
   document.getElementById("panel-seance-active").hidden = false;
-  document.getElementById("seance-active-date").textContent = seanceActive.date;
+  document.getElementById("seance-active-date").textContent = formaterDateFr_(seanceActive.date);
   document.getElementById("seance-notes").value = seanceActive.notes || "";
   await afficherChoixChants();
 }
@@ -239,10 +240,7 @@ async function afficherChoixChants() {
     header.className = "categorie-header";
     header.innerHTML = `
       <h4>${cat}</h4>
-      <span class="tirage-controls">
-        <input type="number" class="nb-a-tirer" data-cat="${cat}" min="0" max="${chantsCat.length}" value="1">
-        <button type="button" class="btn-tirer" data-cat="${cat}">🎲 Tirer</button>
-      </span>
+      <button type="button" class="btn-choix-aleatoire" data-cat="${cat}">🎲 Choix aléatoire</button>
     `;
     bloc.appendChild(header);
 
@@ -250,12 +248,19 @@ async function afficherChoixChants() {
       const row = document.createElement("div");
       row.className = "chant-checkbox";
       const checked = seanceActive.chantsIds.includes(chant.id) ? "checked" : "";
+      const aDetails = chant.paroles || chant.lien;
       row.innerHTML = `
         <label>
           <input type="checkbox" value="${chant.id}" data-categorie="${cat}" data-usage="${chant.nbUtilisations || 0}" ${checked}>
-          ${chant.titre} <span class="usage-badge" title="Nombre de fois utilisé dans les soirées passées">${chant.nbUtilisations || 0}×</span>
+          ${echapperHtml_(chant.titre)} <span class="usage-badge" title="Nombre de fois utilisé dans les soirées passées">${chant.nbUtilisations || 0}×</span>
         </label>
-        <button type="button" class="btn-shuffle" data-cat="${cat}" title="Proposer un autre chant à la place">🔀</button>
+        ${aDetails ? `
+          <details class="chant-paroles">
+            <summary>Paroles${chant.lien ? " et lien" : ""}</summary>
+            ${chant.lien ? `<div class="chant-liens"><a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a></div>` : ""}
+            ${chant.paroles ? `<pre>${echapperHtml_(chant.paroles)}</pre>` : ""}
+          </details>
+        ` : ""}
       `;
       bloc.appendChild(row);
     });
@@ -263,51 +268,23 @@ async function afficherChoixChants() {
     container.appendChild(bloc);
   });
 
-  container.querySelectorAll(".btn-tirer").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const cat = btn.dataset.cat;
-      const nInput = container.querySelector(`.nb-a-tirer[data-cat="${cssEscape_(cat)}"]`);
-      tirerChantsAleatoires(cat, parseInt(nInput.value, 10) || 0);
-    });
-  });
-
-  container.querySelectorAll(".btn-shuffle").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const checkbox = btn.parentElement.querySelector("input[type=checkbox]");
-      remplacerChant(btn.dataset.cat, checkbox);
-    });
+  container.querySelectorAll(".btn-choix-aleatoire").forEach(btn => {
+    btn.addEventListener("click", () => tirerChantAleatoire(btn.dataset.cat));
   });
 }
 
 document.getElementById("btn-tirer-tout").addEventListener("click", () => {
-  document.querySelectorAll(".nb-a-tirer").forEach(input => {
-    tirerChantsAleatoires(input.dataset.cat, parseInt(input.value, 10) || 0);
-  });
+  CATEGORIES.forEach(cat => tirerChantAleatoire(cat));
 });
 
-/** Tire au sort `n` chants dans `categorie` (en favorisant les moins utilisés), remplaçant la sélection actuelle. */
-function tirerChantsAleatoires(categorie, n) {
+/** Tire au sort UN chant dans `categorie` (favorisant les moins utilisés), remplaçant la sélection actuelle de cette catégorie. */
+function tirerChantAleatoire(categorie) {
   const checkboxes = Array.from(
     document.querySelectorAll(`#chants-par-categorie input[type=checkbox][data-categorie="${cssEscape_(categorie)}"]`)
   );
   checkboxes.forEach(cb => (cb.checked = false));
   const poids = checkboxes.map(cb => poidsSelonUsage_(cb));
-  tirageSansRemiseAvecPoids_(checkboxes, poids, n).forEach(cb => (cb.checked = true));
-}
-
-/** Décoche `checkbox` et coche à la place un autre chant (favorisant les moins utilisés) de la même catégorie. */
-function remplacerChant(categorie, checkbox) {
-  checkbox.checked = false;
-  const candidats = Array.from(
-    document.querySelectorAll(`#chants-par-categorie input[type=checkbox][data-categorie="${cssEscape_(categorie)}"]:not(:checked)`)
-  );
-  if (candidats.length === 0) {
-    alert("Aucun autre chant disponible dans cette catégorie.");
-    checkbox.checked = true;
-    return;
-  }
-  const poids = candidats.map(cb => poidsSelonUsage_(cb));
-  tirageSansRemiseAvecPoids_(candidats, poids, 1).forEach(cb => (cb.checked = true));
+  tirageSansRemiseAvecPoids_(checkboxes, poids, 1).forEach(cb => (cb.checked = true));
 }
 
 /** Plus un chant a été utilisé, plus son poids de tirage diminue (sans jamais tomber à zéro). */
@@ -335,6 +312,17 @@ function tirageSansRemiseAvecPoids_(items, poids, n) {
 
 function cssEscape_(str) {
   return window.CSS && CSS.escape ? CSS.escape(str) : str.replace(/([^\w-])/g, "\\$1");
+}
+
+/** Formate une date "YYYY-MM-DD" en français ("jeudi 18 septembre 2026"). */
+function formaterDateFr_(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr.length === 10 ? dateStr + "T00:00:00" : dateStr);
+  if (isNaN(d)) return dateStr;
+  const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+                "août", "septembre", "octobre", "novembre", "décembre"];
+  return `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 document.getElementById("btn-sauver-seance").addEventListener("click", async () => {
@@ -385,7 +373,6 @@ document.getElementById("btn-annuler-ajout-chant").addEventListener("click", () 
 document.getElementById("btn-ajouter-chant").addEventListener("click", async () => {
   const titre = document.getElementById("nouveau-titre").value;
   const categorie = document.getElementById("nouveau-categorie").value;
-  const source = document.getElementById("nouveau-source").value;
   const paroles = document.getElementById("nouveau-paroles").value;
   const lien = document.getElementById("nouveau-lien").value;
   const fichierPartition = document.getElementById("nouveau-partition").files[0];
@@ -394,7 +381,7 @@ document.getElementById("btn-ajouter-chant").addEventListener("click", async () 
   const btn = document.getElementById("btn-ajouter-chant");
   btn.disabled = true;
   try {
-    const { id } = await apiPost("ajouterChant", { titre, categorie, source, paroles, lien });
+    const { id } = await apiPost("ajouterChant", { titre, categorie, paroles, lien });
 
     if (fichierPartition) {
       const fileBase64 = await lireFichierEnBase64_(fichierPartition);
@@ -406,7 +393,7 @@ document.getElementById("btn-ajouter-chant").addEventListener("click", async () 
       });
     }
 
-    ["nouveau-titre", "nouveau-source", "nouveau-paroles", "nouveau-lien"].forEach(
+    ["nouveau-titre", "nouveau-paroles", "nouveau-lien"].forEach(
       idChamp => (document.getElementById(idChamp).value = "")
     );
     document.getElementById("nouveau-partition").value = "";
@@ -484,7 +471,7 @@ function afficherListeChants(chants) {
 
     div.innerHTML = `
       <h4>${echapperHtml_(chant.titre)}</h4>
-      <div class="meta">${echapperHtml_(chant.categorie)}${chant.source ? " · " + echapperHtml_(chant.source) : ""} · utilisé ${chant.nbUtilisations || 0} fois</div>
+      <div class="meta">${echapperHtml_(chant.categorie)} · utilisé ${chant.nbUtilisations || 0} fois</div>
       ${liens.length ? `<div class="chant-liens">${liens.join(" · ")}</div>` : ""}
       ${chant.paroles ? `
         <details class="chant-paroles">
@@ -518,7 +505,7 @@ async function chargerHistorique() {
     const div = document.createElement("div");
     div.className = "chant-item";
     div.innerHTML = `
-      <h4>${s.date}</h4>
+      <h4>${formaterDateFr_(s.date)}</h4>
       <div class="meta">${s.chantsIds.length} chant(s) sélectionné(s) · ${s.statut}</div>
     `;
     container.appendChild(div);
