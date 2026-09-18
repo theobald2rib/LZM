@@ -190,6 +190,8 @@ button:hover { background: var(--encre-clair); }
 
 /* ---- Tirage aléatoire des chants ---- */
 
+#btn-nouvelle-seance { margin-top: 1rem; }
+
 #btn-tirer-tout {
   background: var(--bordeaux);
   margin-bottom: 1rem;
@@ -271,6 +273,21 @@ button:hover { background: var(--encre-clair); }
   color: var(--texte);
 }
 
+.chant-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.chant-item-header h4 { margin: 0; }
+
+.btn-modifier-chant {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.7rem;
+  flex-shrink: 0;
+}
+
 .chant-item .meta {
   font-size: 0.85rem;
   font-style: italic;
@@ -348,6 +365,30 @@ button:hover { background: var(--encre-clair); }
 }
 
 .livret-section .rubrique { max-width: 68ch; }
+
+.deroule-insert {
+  margin: 0 0 1.75rem;
+}
+
+.deroule-chant {
+  background: var(--parchemin);
+  border-left: 3px solid var(--or);
+  padding: 0.9rem 1.1rem;
+}
+
+.deroule-chant h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--encre);
+  margin: 0 0 0.4rem;
+}
+
+.deroule-chant pre {
+  font-family: var(--font-body);
+  white-space: pre-wrap;
+  margin: 0.5rem 0 0;
+  max-width: 68ch;
+}
 
 /* ---- En-tête de panneau avec action ---- */
 
@@ -495,6 +536,14 @@ dialog h2 {
   }
 
   .panel-header-row button { width: 100%; }
+
+  .chant-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .btn-modifier-chant { align-self: flex-start; }
 
   dialog {
     width: 100vw;
