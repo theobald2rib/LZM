@@ -25,18 +25,13 @@
   <main>
     <!-- Onglet : Préparer une soirée -->
     <section id="tab-preparer" class="tab-content active">
-      <div class="panel">
+      <div class="panel" id="panel-formulaire-seance">
         <h2>Nouvelle soirée</h2>
         <div class="form-row">
           <label>Date
             <input type="date" id="seance-date">
           </label>
-          <button id="btn-nouvelle-seance">Créer la soirée</button>
         </div>
-      </div>
-
-      <div class="panel" id="panel-seance-active" hidden>
-        <h2>Soirée du <span id="seance-active-date"></span></h2>
 
         <h3>Choisir les chants</h3>
         <button type="button" id="btn-tirer-tout">🎲 Choix aléatoire (toutes catégories)</button>
@@ -44,7 +39,17 @@
 
         <h3>Notes de préparation</h3>
         <textarea id="seance-notes" rows="3" placeholder="Notes libres pour la soirée…"></textarea>
-        <button id="btn-sauver-seance">Enregistrer</button>
+
+        <button id="btn-nouvelle-seance">Créer la soirée</button>
+      </div>
+
+      <div class="panel" id="panel-deroule-seance" hidden>
+        <div class="panel-header-row">
+          <h2>Séance du <span id="deroule-date"></span></h2>
+          <button type="button" id="btn-nouvelle-soiree-reset" class="btn-secondaire">Nouvelle soirée</button>
+        </div>
+
+        <div id="deroule-contenu"></div>
 
         <h3>Export</h3>
         <div class="export-buttons">
