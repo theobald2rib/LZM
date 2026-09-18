@@ -561,6 +561,7 @@ const dialogImportMasse = document.getElementById("dialog-import-masse");
 
 document.getElementById("btn-ouvrir-import-masse").addEventListener("click", () => {
   document.getElementById("import-masse-resultat").innerHTML = "";
+  document.getElementById("btn-annuler-import-masse").textContent = "Annuler";
   dialogImportMasse.showModal();
 });
 document.getElementById("btn-annuler-import-masse").addEventListener("click", () => {
@@ -582,6 +583,7 @@ document.getElementById("btn-lancer-import-masse").addEventListener("click", asy
     tousLesChants = [];
     await chargerReferentielChants();
     zoneResultat.textContent = "Référentiel mis à jour — vérifiez la liste ci-dessous.";
+    document.getElementById("btn-annuler-import-masse").textContent = "Fermer";
   } catch (e) {
     zoneResultat.textContent = "Erreur : " + e.message;
   } finally {
