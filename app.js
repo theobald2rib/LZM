@@ -1,6 +1,5 @@
 // ⚠️ À remplacer par l'URL /exec de votre déploiement Apps Script (voir README.md)
 const API_URL = "https://script.google.com/macros/s/AKfycbwmAdRHiaE9p1u7jV92fiZv0HC1GLnZVlrU2_YkQ4lGIxgFjXxwxpUmE1HB89oUfd-6/exec";
-
 const CATEGORIES = ["Louange", "Méditation", "Esprit-Saint", "Marie"];
 
 let seanceActive = null;
@@ -181,6 +180,21 @@ async function apiPostVolumineux(action, payload = {}) {
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify({ action, ...payload })
   });
+}
+
+function cssEscape_(str) {
+  return window.CSS && CSS.escape ? CSS.escape(str) : str.replace(/([^\w-])/g, "\\$1");
+}
+
+/** Formate une date "YYYY-MM-DD" en français ("jeudi 18 septembre 2026"). */
+function formaterDateFr_(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr.length === 10 ? dateStr + "T00:00:00" : dateStr);
+  if (isNaN(d)) return dateStr;
+  const jours = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+  const mois = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+                "août", "septembre", "octobre", "novembre", "décembre"];
+  return `${jours[d.getDay()]} ${d.getDate()} ${mois[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 // ---- Onglets ------------------------------------------------------------
@@ -554,30 +568,42 @@ document.getElementById("btn-lancer-import-masse").addEventListener("click", asy
 function afficherListeChants(chants) {
   const container = document.getElementById("liste-chants");
   container.innerHTML = "";
-  chants.forEach(chant => {
-    const div = document.createElement("div");
-    div.className = "chant-item";
-    div.dataset.id = chant.id;
 
-    const liens = [];
-    if (chant.lien) liens.push(`<a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a>`);
-    if (chant.partitionUrl) liens.push(`<a href="${echapperHtml_(chant.partitionUrl)}" target="_blank">🎼 Partition</a>`);
+  CATEGORIES.forEach(cat => {
+    const chantsCat = chants.filter(c => c.categorie === cat);
+    if (chantsCat.length === 0) return;
 
-    div.innerHTML = `
-      <div class="chant-item-header">
-        <h4>${echapperHtml_(chant.titre)}</h4>
-        <button type="button" class="btn-secondaire btn-modifier-chant" data-id="${chant.id}">Modifier</button>
-      </div>
-      <div class="meta">${echapperHtml_(chant.categorie)} · utilisé ${chant.nbUtilisations || 0} fois</div>
-      ${liens.length ? `<div class="chant-liens">${liens.join(" · ")}</div>` : ""}
-      ${chant.paroles ? `
-        <details class="chant-paroles">
-          <summary>Voir les paroles</summary>
-          <pre>${echapperHtml_(chant.paroles)}</pre>
-        </details>
-      ` : ""}
-    `;
-    container.appendChild(div);
+    const bloc = document.createElement("div");
+    bloc.className = "categorie-bloc";
+    bloc.innerHTML = `<div class="categorie-header"><h4>${echapperHtml_(cat)}</h4></div>`;
+
+    chantsCat.forEach(chant => {
+      const div = document.createElement("div");
+      div.className = "chant-item";
+      div.dataset.id = chant.id;
+
+      const liens = [];
+      if (chant.lien) liens.push(`<a href="${echapperHtml_(chant.lien)}" target="_blank">▶ Écouter</a>`);
+      if (chant.partitionUrl) liens.push(`<a href="${echapperHtml_(chant.partitionUrl)}" target="_blank">🎼 Partition</a>`);
+
+      div.innerHTML = `
+        <div class="chant-item-header">
+          <h4>${echapperHtml_(chant.titre)}</h4>
+          <button type="button" class="btn-secondaire btn-modifier-chant" data-id="${chant.id}">Modifier</button>
+        </div>
+        <div class="meta">utilisé ${chant.nbUtilisations || 0} fois</div>
+        ${liens.length ? `<div class="chant-liens">${liens.join(" · ")}</div>` : ""}
+        ${chant.paroles ? `
+          <details class="chant-paroles">
+            <summary>Voir les paroles</summary>
+            <pre>${echapperHtml_(chant.paroles)}</pre>
+          </details>
+        ` : ""}
+      `;
+      bloc.appendChild(div);
+    });
+
+    container.appendChild(bloc);
   });
 
   container.querySelectorAll(".btn-modifier-chant").forEach(btn => {
