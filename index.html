@@ -83,7 +83,10 @@
       <div class="panel">
         <div class="panel-header-row">
           <h2>Chants du référentiel</h2>
-          <button type="button" id="btn-ouvrir-ajout-chant">+ Ajouter un chant</button>
+          <div class="panel-header-actions">
+            <button type="button" id="btn-ouvrir-import-masse" class="btn-secondaire">Importer plusieurs chants</button>
+            <button type="button" id="btn-ouvrir-ajout-chant">+ Ajouter un chant</button>
+          </div>
         </div>
         <input type="search" id="recherche-chants" placeholder="Rechercher un chant…">
         <div id="liste-chants"></div>
@@ -122,6 +125,33 @@
     <div class="dialog-actions">
       <button type="button" id="btn-annuler-ajout-chant" class="btn-secondaire">Annuler</button>
       <button type="button" id="btn-ajouter-chant">Ajouter au référentiel</button>
+    </div>
+  </dialog>
+
+  <!-- Fenêtre modale : importer plusieurs chants d'un coup -->
+  <dialog id="dialog-import-masse">
+    <h2>Importer plusieurs chants</h2>
+    <p class="rubrique">
+      Un bloc par chant, séparés par une ligne "---". Si le titre existe déjà dans le référentiel, il est mis à jour (paroles, catégorie…) plutôt que dupliqué.
+    </p>
+    <pre class="format-exemple">Titre: Écoute ton Dieu t'appelle
+Catégorie: Louange
+Lien: https://...
+Paroles:
+Écoute, ton Dieu t'appelle...
+(ligne vide entre les couplets)
+
+Refrain...
+---
+Titre: Chant suivant
+Catégorie: Marie
+Paroles:
+...</pre>
+    <textarea id="import-masse-texte" rows="10" placeholder="Collez ici vos chants au format ci-dessus…"></textarea>
+    <div id="import-masse-resultat"></div>
+    <div class="dialog-actions">
+      <button type="button" id="btn-annuler-import-masse" class="btn-secondaire">Annuler</button>
+      <button type="button" id="btn-lancer-import-masse">Importer</button>
     </div>
   </dialog>
 
